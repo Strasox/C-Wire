@@ -1,0 +1,13 @@
+Votre travail est de filtrer et traiter ces données au moyen d’un script
+shell (partie filtrage) et d’un programme C (partie traitement/calcul).
+
+Chaque poste LV est relié à une seule station HV-A, chaque station HV-A
+est reliée à une seule station HV-B, et chaque station HV-B est reliée à
+une seule centrale. Il y a plusieurs centrales.
+➢ Dans l’intégralité des données à disposition, nous avons :
+• 5 centrales
+• ~118 sous-stations HV-B
+• ~512 sous-stations HV-A
+• +180k postes LV
+• +1.25M consommateurs (entreprises)
+• +7.6M consommateurs (particuliers)
