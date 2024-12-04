@@ -11,3 +11,23 @@ une seule centrale. Il y a plusieurs centrales.
 • +180k postes LV
 • +1.25M consommateurs (entreprises)
 • +7.6M consommateurs (particuliers)
+
+Le fichier de données est un fichier CSV contenant les noms de colonnes
+suivants :
+▪ Power plant : identifiant d’une centrale électrique
+(producteur)
+▪ HV-B Station : identifiant d’une station HV-B
+▪ HV-A Station : identifiant d’une station HV-A
+▪ LV Station : identifiant d’un poste LV
+▪ Company : identifiant d’une entreprise (consommateur)
+▪ Individual : identifiant d’un particulier (consommateur)
+▪ Capacity : quantité d’énergie produite par une centrale ou
+transférée par une station HV-B, HV-A ou LV (en kWh)
+▪ Load : quantité d’énergie consommée par le consommateur
+final entreprise ou particulier (en kWh)
+
+Fichier Principale:
+c-wire.sh
+
+le but, pouvoir faire: ./c-wire.sh {chemin du fichier} {type de station} {type de consommateur} ... ??
+il manque des info parceque j'ai pas compris 
