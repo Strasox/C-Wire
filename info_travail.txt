@@ -31,3 +31,5 @@ c-wire.sh
 
 le but, pouvoir faire: ./c-wire.sh {chemin du fichier} {type de station} {type de consommateur} ... ??
 il manque des info parceque j'ai pas compris 
+
+
