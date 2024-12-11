@@ -4,6 +4,8 @@
 
 # Fonction pour afficher l'aide (-h)
 affiche_-h(){
+    echo
+    echo
     echo "Aide : $0 [-h] <chemin_du_fichier> <type_de_station> <type_de_consommateur> [Identifiant_de_centrale]"
     echo
     echo "Description :"
@@ -15,14 +17,14 @@ affiche_-h(){
     echo " <type_de_station> (Obligatoire) Type de station à traiter (hvb, hva, lv)"
     echo " <type_de_consommateur> (Obligatoire) Type de consommateur à traiter (comp, indiv, all)"
     echo " [Identifiant_de_centrale] (Optionnel) Affiche les résultats pour une centrale spécifique ou, si laissé vide, pour toutes les centrales." 
-    echo 
+    echo
     echo "Limitation :"
     echo " Les options (hvb, hva) ne sont pas compatible avec (all, indiv) et ne sont donc pas autoriser."
     exit 0
 }
 
 # On verifie si l'un des parametre est -h
-for option in "$*"; do
+for option in "$@"; do
     if [[ "$option" == "-h" ]]; then
         affiche_-h
     fi
