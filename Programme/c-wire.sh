@@ -4,26 +4,26 @@
 
 # Fonction pour afficher l'aide (-h)
 affiche_-h(){
-    echo "Usage : $0 [options] [paramètres]"
+    echo "Aide : $0 [-h] <chemin_du_fichier> <type_de_station> <type_de_consommateur> [Identifiant_de_centrale]"
     echo
     echo "Description :"
-    echo "Ce script permet de traiter les informations des stations et des centrales."
+    echo "Ce script permet de traiter les informations d'un fichier selon les paramètre de l'utilisateur de crée un nouveau fichier avec ces résultat."
     echo
     echo "Options :"
-    echo "  -h        Affiche cette aide et ignore les autres options."
-    echo "  <id_centrale>  (optionnel) Filtre les résultats pour une centrale spécifique."
-    echo "  <num_station>  (optionnel) Numéro de la station à traiter (doit être un entier positif)."
-    echo
-    echo "Exemple d'utilisation :"
-    echo "  $0 -h"
-    echo "  $0 12345"
-    echo "  $0 12345 5"
+    echo " [-h] (Optionnel) Affiche l'aide de cette commande et ignore les autres options."
+    echo " <chemin_du_fichier> (Obligatoire) Chemin indiquant l'endroit du fichier à traiter."
+    echo " <type_de_station> (Obligatoire) Type de station à traiter (hvb, hva, lv)"
+    echo " <type_de_consommateur> (Obligatoire) Type de consommateur à traiter (comp, indiv, all)"
+    echo " [Identifiant_de_centrale] (Optionnel) Affiche les résultats pour une centrale spécifique ou, si laissé vide, pour toutes les centrales." 
+    echo 
+    echo "Limitation :"
+    echo " Les options (hvb, hva) ne sont pas compatible avec (all, indiv) et ne sont donc pas autoriser."
     exit 0
 }
 
 # On verifie si l'un des parametre est -h
-for argument in "$*"; do
-    if [[ "$argument" == "-h" ]]; then
+for option in "$*"; do
+    if [[ "$option" == "-h" ]]; then
         affiche_-h
     fi
 done

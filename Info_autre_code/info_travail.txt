@@ -1,3 +1,6 @@
+./Programme/c-wire.sh Programme/input/c-wire_v00.dat hvb comp
+
+
 Votre travail est de filtrer et traiter ces données au moyen d’un script
 shell (partie filtrage) et d’un programme C (partie traitement/calcul).
 
@@ -25,12 +28,6 @@ suivants :
 transférée par une station HV-B, HV-A ou LV (en kWh)
 ▪ Load : quantité d’énergie consommée par le consommateur
 final entreprise ou particulier (en kWh)
-
-Fichier Principale:
-c-wire.sh
-
-le but, pouvoir faire: ./c-wire.sh {chemin du fichier} {type de station} {type de consommateur} ... ??
-il manque des info parceque j'ai pas compris 
 
 
 
