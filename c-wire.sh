@@ -102,4 +102,27 @@ if [ ! -z "$4" ];then
     fi
 fi
 
+# Verification de l'existance de l'executable c 
+#if [ ! -x "codeC/exec" ]; then
+#    make -C codeC
+#    if [ ! -x "codeC/exec" ]; then
+#        echo "Erreu: Le fichier executable C est introuvable et ne peut pas etre cree."
+#        affiche_temps
+#        exit 8
+#    fi
+#fi
 
+# Vérification présence du dossier tmp et création si il n'existe pas 
+if [ ! -d "tmp" ]; then 
+    mkdir tmp
+else
+    rm -rf tmp/*
+fi
+
+# Vérification de la présence de graphs et création si il n'existe pas
+if [ ! -d "graphs" ]; then
+    mkdir graphs
+fi
+
+
+echo "Fin du Programme"
