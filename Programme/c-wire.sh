@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Début du calcule du temps d'execution
-debut=$(date +%s)
+# Début du calcule du temps d'execution en nanosecondes 
+temps_debut=$(date +%s%1N)
 
 # Fonction pour afficher l'aide (-h)
 affiche_-h(){
@@ -24,9 +24,12 @@ affiche_-h(){
 
 # Fonction pour afficher le temps d'execution du fichier 
 affiche_temps(){
-    fin=$(date +%s)
-    duree=$(( $fin - $debut ))
-    echo "[$duree sec]"
+    # On prend le temps maintenant, en fin de programme en seconde et nanoseconde
+    temps_fin=$(date +%s%1N)
+    # On soustrait le temps du début à celui de maintenant que l'on divise par 10 pour la décimal et comme on fait une opération sur float on doit envoyer à bc 
+    temps=$(bc <<< "scale=1; ($temps_fin - $temps_debut) / 10")
+    # Affichage avec la virgule et le 0 toujours afficher et sans retour à la ligne
+    printf "[%.1f sec] " $temps
 }
 
 ## On verifie les argument entrer par l'utilisateur
