@@ -1,1 +1,1 @@
-./Programme/c-wire.sh Programme/input/c-wire_v00.dat hvb comp
+./c-wire.sh input/c-wire_v00.dat hvb comp
