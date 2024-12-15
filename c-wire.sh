@@ -134,5 +134,33 @@ if [ ! -d "graphs" ]; then
     mkdir graphs
 fi
 
+# On regarde l'option 4 des centrale
+if [ -z "$4" ]; then
+    # On cree un fichier avec les donner a traiter pour tout les centrale
+    grep "$2" "$1" > "tmp/donner_a_traiter.cvs"
+else
+    # On cree un fichier avec les donner a traiter pour tout les centrale
+    grep "$2" "$1" | grep "$4" > "tmp/donner_a_traiter.cvs"
+fi
 
+# Vérification si le fichier temporaire contient des données
+if [ ! -e "tmp/donner_a_traiter.cvs" ]; then
+    echo "Erreur: Le fichier n'a pas ete cree."
+    affiche_temps
+    exit 10
+fi
+
+codeC/exec "tmp/donner_a_traiter.cvs" > tmp/resultats.csv
+if [ $? -ne 0 ]; then
+    echo "Erreur: Le programme C a eu une erreur."
+    affiche_temps
+    exit 11
+fi
+
+
+
+
+
+affiche_temps
 echo "Fin du Programme"
+exit 0
