@@ -155,6 +155,17 @@ case "$3" in
 esac
 
 
+if [ ! -z "$4" ]; then
+    # Commande pour filtrer selon le numéro de central, la station
+    awk -F';' -v central="$4" -v station_colonne="$station_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $(station_colonne+1) == "-" && $8 == "-"' "$1" > tmp/filtre_station.csv
+    awk -F';' -v central="$4" -v station_colonne="$station_colonne" -v consomateur="$consomateur_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $consomateur != "-"' "$1" > tmp/filtre_consomateur.csv
+else
+    awk -F';' -v station_colonne="$station_colonne" 'NR > 1 && $(station_colonne) != "-" && $(station_colonne+1) == "-" && $8 == "-"' "$1" > tmp/filtre_station.csv
+    awk -F';' -v station_colonne="$station_colonne" -v consomateur="$consomateur_colonne" 'NR > 1 && $(station_colonne) != "-" && $consomateur != "-"' "$1" > tmp/filtre_consomateur.csv
+fi
+
+
+
 
 
 
