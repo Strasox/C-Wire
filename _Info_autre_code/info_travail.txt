@@ -1,1 +1,3 @@
 ./c-wire.sh input/c-wire_v00.dat hvb comp
+
+D'après le prof on crée les fichier finaux dans le C.

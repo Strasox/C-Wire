@@ -113,6 +113,7 @@ if [ ! -x "codeC/exec" ]; then
 
     # Execution du makefile
     make -C codeC 
+
     # Verification de l'existance de l'executable c 
     if [ ! -x "codeC/exec" ]; then
         echo "Erreu: Le fichier executable C est introuvable et ne peut pas etre cree."
@@ -155,17 +156,21 @@ esac
 
 
 if [ ! -z "$4" ]; then
-    # Commande pour filtrer selon le numéro de central, on met tout les station rechercher dans un fichier (Aide: ChatGPT,IBM,Funix,StackOverflow,Redit)
+    #Commande pour filtrer en sautant la 1er ligne selon le numéro de central, la colone ou la station que on recherche est(différent de -) et donc la prochaine colonne doit 
+    #être vide(soit la prochaine station, donc on doit ne rien avoir(-) ou la company dans le cas des lv et donc aussi vide ) on met tout les station qui réponde à ces 
+    #critère dans un fichier (Aide: ChatGPT,IBM,Funix,StackOverflow,Redit)
     awk -F';' -v central="$4" -v station_colonne="$station_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $(station_colonne+1) == "-" && $8 == "-"' "$1" > tmp/filtre_station.csv
 
     #Si on prend tout les consomateur
     if [ $consomateur_colonne == "all" ]; then 
-        #
+        #On enregistre dans un fichier les consomateur, selon la central, la colonne de la station recherché et la consomation doit être différent de rien (-)
         awk -F';' -v central="$4" -v station_colonne="$station_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $8 != "-"' "$1" > tmp/filtre_consomateur.csv
     else
+        #Meme chose mais on à un consomateur spécifique donc on vérifie la colone des consomateur
         awk -F';' -v central="$4" -v station_colonne="$station_colonne" -v consomateur="$consomateur_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $consomateur != "-"' "$1" > tmp/filtre_consomateur.csv
     fi
 else
+    #Meme chose mais sans filtrer par central
     awk -F';' -v station_colonne="$station_colonne" 'NR > 1 && $(station_colonne) != "-" && $(station_colonne+1) == "-" && $8 == "-"' "$1" > tmp/filtre_station.csv
     if [ $consomateur_colonne == "all" ]; then 
         awk -F';' -v station_colonne="$station_colonne" 'NR > 1 && $(station_colonne) != "-" && $8 != "-"' "$1" > tmp/filtre_consomateur.csv
@@ -174,12 +179,10 @@ else
     fi
 fi
 
-
-
+#On execute les programes C
 ./codeC/exec tmp/filtre_station.csv tmp/filtre_consomateur.csv
 
-
-
+#Verif à rajouter pour l'exec ??
 
 affiche_temps
 echo "Fin du Programme"
