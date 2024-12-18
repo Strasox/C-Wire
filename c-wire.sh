@@ -112,8 +112,7 @@ if [ ! -x "codeC/exec" ]; then
     fi
 
     # Execution du makefile
-    make -C codeC --no-print-directory
-
+    make -C codeC 
     # Verification de l'existance de l'executable c 
     if [ ! -x "codeC/exec" ]; then
         echo "Erreu: Le fichier executable C est introuvable et ne peut pas etre cree."
@@ -156,17 +155,28 @@ esac
 
 
 if [ ! -z "$4" ]; then
-    # Commande pour filtrer selon le numéro de central, la station
+    # Commande pour filtrer selon le numéro de central, on met tout les station rechercher dans un fichier (Aide: ChatGPT,IBM,Funix,StackOverflow,Redit)
     awk -F';' -v central="$4" -v station_colonne="$station_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $(station_colonne+1) == "-" && $8 == "-"' "$1" > tmp/filtre_station.csv
-    awk -F';' -v central="$4" -v station_colonne="$station_colonne" -v consomateur="$consomateur_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $consomateur != "-"' "$1" > tmp/filtre_consomateur.csv
+
+    #Si on prend tout les consomateur
+    if [ $consomateur_colonne == "all" ]; then 
+        #
+        awk -F';' -v central="$4" -v station_colonne="$station_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $8 != "-"' "$1" > tmp/filtre_consomateur.csv
+    else
+        awk -F';' -v central="$4" -v station_colonne="$station_colonne" -v consomateur="$consomateur_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $consomateur != "-"' "$1" > tmp/filtre_consomateur.csv
+    fi
 else
     awk -F';' -v station_colonne="$station_colonne" 'NR > 1 && $(station_colonne) != "-" && $(station_colonne+1) == "-" && $8 == "-"' "$1" > tmp/filtre_station.csv
-    awk -F';' -v station_colonne="$station_colonne" -v consomateur="$consomateur_colonne" 'NR > 1 && $(station_colonne) != "-" && $consomateur != "-"' "$1" > tmp/filtre_consomateur.csv
+    if [ $consomateur_colonne == "all" ]; then 
+        awk -F';' -v station_colonne="$station_colonne" 'NR > 1 && $(station_colonne) != "-" && $8 != "-"' "$1" > tmp/filtre_consomateur.csv
+    else
+        awk -F';' -v station_colonne="$station_colonne" -v consomateur="$consomateur_colonne" 'NR > 1 && $(station_colonne) != "-" && $consomateur != "-"' "$1" > tmp/filtre_consomateur.csv
+    fi
 fi
 
 
 
-
+./codeC/exec tmp/filtre_station.csv tmp/filtre_consomateur.csv
 
 
 
