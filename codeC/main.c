@@ -1,46 +1,44 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct station
-{
-    int centrale;
-    int hvb;
-    int hva;
-    int lv;
-    int compagnie;
-    int capacite;
-    int conso;
+typedef struct {
+
+    int identifiant;  // Identifiant d'un station
+    int capacite;     // Capacité d'une station
+    int consommation; // Consomation à calculer d'une station
 
 }Station;
 
 typedef struct avl_struct
 {
-    Station *val;             // pointeur vers les valeurs du nœud
+    Station *station;      // pointeur vers les valeurs du nœud
     int eq;                // Facteur d'équilibre 
     struct avl_struct *fg; // Pointeur vers le fils gauche
     struct avl_struct *fd; // Pointeur vers le fils droit
 } AVL;
 
-AVL* creerAVL(int e, int f, int g, int h, int i, int j, int k)
+AVL* creerAVL(int id, int capacite)
 {
     // Alloue de la mémoire pour un nouveau nœud
-    AVL* new = (AVL* )malloc(sizeof(AVL));
-    if (new == NULL)
+    AVL* nouv = (AVL* )malloc(sizeof(AVL));
+    if (nouv == NULL)
     {
         exit(EXIT_FAILURE); // Arrêt immédiat en cas d'erreur d'allocation
     }
-    new->val->centrale = e;
-    new->val->hvb = f;
-    new->val->hva = g;
-    new->val->lv = h;
-    new->val->compagnie = i;
-    new->val->capacite = j;
-    new->val->conso = k;
-    new->fg = NULL; // Pas de fils gauche
-    new->fd = NULL; // Pas de fils droit
-    new->eq = 0;    // Facteur d'équilibre initialisé à 0
-    return new;
+
+    // Initialisation des valeurs de base
+    nouv->station->identifiant = id;
+    nouv->station->capacite = capacite;
+    nouv->station->consommation = 0;
+    nouv->fg = NULL; // Pas de fils gauche
+    nouv->fd = NULL; // Pas de fils droit
+    nouv->eq = 0;    // Facteur d'équilibre initialisé à 0
+    return nouv;
 }
+
+
+
+
 
 AVL* equilibrerAVL(AVL* a)
 {

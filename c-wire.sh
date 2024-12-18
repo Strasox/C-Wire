@@ -122,7 +122,7 @@ if [ ! -x "codeC/exec" ]; then
     fi
 fi
 
-# Vérification présence du dossier tmp et création si il n'existe pas 
+# Vérification présence du dossier tmp et création si il n'existe pas et on vide si il existe deja
 if [ ! -d "tmp" ]; then 
     mkdir tmp
 else
