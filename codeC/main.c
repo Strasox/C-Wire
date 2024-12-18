@@ -12,18 +12,18 @@ typedef struct {
 typedef struct avl_struct
 {
     Station *station;      // pointeur vers les valeurs du nœud
-    int eq;                // Facteur d'équilibre 
     struct avl_struct *fg; // Pointeur vers le fils gauche
     struct avl_struct *fd; // Pointeur vers le fils droit
-} AVL;
+    int eq;                // Facteur d'équilibre 
+} Noeud;
 
-AVL* creerAVL(int id, int capacite)
+Noeud* creerAVL(int id, int capacite)
 {
     // Alloue de la mémoire pour un nouveau nœud
-    AVL* nouv = (AVL* )malloc(sizeof(AVL));
+    Noeud* nouv = (Noeud* )malloc(sizeof(Noeud));
     if (nouv == NULL)
     {
-        exit(EXIT_FAILURE); // Arrêt immédiat en cas d'erreur d'allocation
+        exit(1); // Arrêt immédiat en cas d'erreur d'allocation
     }
 
     // Initialisation des valeurs de base
@@ -36,9 +36,43 @@ AVL* creerAVL(int id, int capacite)
     return nouv;
 }
 
+/*
+// Fonction pour calculer la hauteur d'un arbre
+int hauteur(Noeud* abr) {
+    if (abr == NULL){
+       return -1;
+    }
+    int hGauche = hauteur(abr->fg);
+    int hDroit = hauteur(abr->fd);
+    return (hGauche > hDroit) ? hGauche + 1 : hDroit + 1;
+}
 
+// Rotation gauche (simple)
+Noeud* rotationGauche(Noeud* abr) {
+    Noeud* p = abr->fd;
+    abr->fd = p->fg;
+    p->fg = abr_a;
+    abr->eq = hauteur(abr->fg) - hauteur(abr->fd);
+    p->eq = hauteur(p->fg) - hauteur(p->fd);
+    return p;
+}
 
+AVL* rotationGauche(AVL* a)
+{
+    AVL* pivot = a->fd; // Le fils droit devient le pivot
+    int eq_a = a->eq, eq_p = pivot->eq;
 
+    a->fd = pivot->fg; // Le sous-arbre gauche du pivot devient le fils droit de `a`
+    pivot->fg = a;     // `a` devient le fils gauche du pivot
+
+    // Mise à jour des facteurs d'équilibre
+    a->eq = eq_a - max(eq_p, 0) - 1;
+    pivot->eq = min3(eq_a - 2, eq_a + eq_p - 2, eq_p - 1);
+
+    return pivot; // Le pivot devient la nouvelle racine
+}
+
+*/
 
 AVL* equilibrerAVL(AVL* a)
 {
