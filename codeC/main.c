@@ -247,6 +247,51 @@ void insertionStation(AVL **abr, int colonneStation) {
     fclose(fichier);
 }
 
+void calculConso( AVL* abr, int colonneStation){
+    int colonne = 0;
+    int somme;
+    int idStation;
+    int tmp;
+    char* donnee;
+    char ligne[1024];  // Buffer pour lire chaque ligne du fichier
+    FILE* fichier = fopen("tmp/filtre_station.csv", "r");
+    if (fichier == NULL) {
+        printf("Erreur : fichier vide ou inaccessible.\n");
+        exit(0);
+    }
+    
+    while (fgets(ligne, sizeof(ligne), fichier)) {
+        colonne = 0;  // La colonne ou on est placée
+        s = malloc(sizeof(Station));
+        if (s == NULL) {
+            printf("Erreur d'allocation mémoire pour la station.\n");
+            exit(1);
+        }
+        
+        donnee = strtok(ligne, ";");
+        while (donnee != NULL) {
+            
+            if (colonne == colonneStation-1) {
+                if ( idStation == NULL || idStation != atoi(donnee)){
+                    idStation = atoi(donnee);
+                    tmp = 0;
+                }
+                else{
+                    tmp = 1;
+                }
+            
+            else if (colonne == 7) {
+                
+                somme += atoi(donnee);
+            }
+            colonne++;
+            donnee = strtok(NULL, ";");
+        }
+        s->consommation = 0;  
+        *abr = mofificationAVL(abr, idStation, somme);  // Insertion dans l'AVL
+    }
+    fclose(fichier);
+}
 
 
 
