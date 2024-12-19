@@ -1,26 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct {
-
+typedef struct 
+{
     int identifiant;  // Identifiant d'un station
     int capacite;     // Capacité d'une station
     int consommation; // Consomation à calculer d'une station
-
 }Station;
 
-typedef struct avl_struct
+typedef struct avl
 {
-    Station *station;      // pointeur vers les valeurs du nœud
-    struct avl_struct *fg; // Pointeur vers le fils gauche
-    struct avl_struct *fd; // Pointeur vers le fils droit
-    int eq;                // Facteur d'équilibre 
-} Noeud;
+    Station* station;   // pointeur vers les valeurs du nœud
+    struct avl* fg;     // Pointeur vers le fils gauche
+    struct avl* fd;     // Pointeur vers le fils droit
+    int eq;             // Facteur d'équilibre 
+} AVL;
 
-Noeud* creerAVL(int id, int capacite)
+
+
+AVL* creerAVL(int id, int capacite)
 {
     // Alloue de la mémoire pour un nouveau nœud
-    Noeud* nouv = (Noeud* )malloc(sizeof(Noeud));
+    AVL* nouv = (AVL*)malloc(sizeof(AVL));
     if (nouv == NULL)
     {
         exit(1); // Arrêt immédiat en cas d'erreur d'allocation
@@ -36,103 +37,100 @@ Noeud* creerAVL(int id, int capacite)
     return nouv;
 }
 
-/*
-// Fonction pour calculer la hauteur d'un arbre
-int hauteur(Noeud* abr) {
-    if (abr == NULL){
-       return -1;
-    }
-    int hGauche = hauteur(abr->fg);
-    int hDroit = hauteur(abr->fd);
-    return (hGauche > hDroit) ? hGauche + 1 : hDroit + 1;
-}
 
-// Rotation gauche (simple)
-Noeud* rotationGauche(Noeud* abr) {
-    Noeud* p = abr->fd;
+// Rotation gauche pour rééquilibrer un AVL
+AVL* rotationGauche(AVL* abr){
+    // On initialise le pivot
+    AVL* p = abr->fd;
+    int eq_a = abr->eq;
+    int eq_p = abr->eq;
+
+    // On rééquilibre l'AVL
     abr->fd = p->fg;
-    p->fg = abr_a;
-    abr->eq = hauteur(abr->fg) - hauteur(abr->fd);
-    p->eq = hauteur(p->fg) - hauteur(p->fd);
+    p->fg = abr;
+
+    // On rééquilibre les noeud 
+    abr->eq = eq_a - max(eq_p, 0) - 1;
+    p->eq = min( eq_a-2, eq_a+eq_p-2, eq_p-1 );
     return p;
 }
 
-AVL* rotationGauche(AVL* a)
-{
-    AVL* pivot = a->fd; // Le fils droit devient le pivot
-    int eq_a = a->eq, eq_p = pivot->eq;
+// Rotation droite pour rééquilibrer un AVL
+AVL* rotationDroite(AVL* abr){
+    // On initialise le pivot
+    AVL* p = abr->fg;
+    int eq_a = abr->eq;
+    int eq_p = abr->eq;
 
-    a->fd = pivot->fg; // Le sous-arbre gauche du pivot devient le fils droit de `a`
-    pivot->fg = a;     // `a` devient le fils gauche du pivot
+    // On rééquilibre l'AVL
+    abr->fg = p->fd;
+    p->fd = abr;
 
-    // Mise à jour des facteurs d'équilibre
-    a->eq = eq_a - max(eq_p, 0) - 1;
-    pivot->eq = min3(eq_a - 2, eq_a + eq_p - 2, eq_p - 1);
-
-    return pivot; // Le pivot devient la nouvelle racine
+    // On rééquilibre les noeud 
+    abr->eq = eq_a - min(eq_p, 0) + 1;
+    p->eq = max( eq_a+2, eq_a+eq_p+2, eq_p+1 );
+    return p;
 }
 
-*/
-
-AVL* equilibrerAVL(AVL* a)
-{
-    if (a->eq >= 2)
-    { // Cas où l'arbre est déséquilibré à droite
-        if (a->fd->eq >= 0)
-        {
-            return rotationGauche(a); // Rotation simple gauche
-        }
-        else
-        {
-            return doubleRotationGauche(a); // Double rotation gauche
-        }
-    }
-    else if (a->eq <= -2)
-    { // Cas où l'arbre est déséquilibré à gauche
-        if (a->fg->eq <= 0)
-        {
-            return rotationDroite(a); // Rotation simple droite
-        }
-        else
-        {
-            return doubleRotationDroite(a); // Double rotation droite
-        }
-    }
-    return a; // Aucun rééquilibrage nécessaire
+AVL* doubleRotationDroite(AVL* abr){
+    abr->fg = rotationGauche(abr->fg);
+    return rotationDroite(abr);
 }
 
+AVL* doubleRotationGauche(AVL* abr){
+    abr->fd = rotationDroite(abr->fd);
+    return rotationGauche(abr);
+}
 
-AVL* insertionAVL(AVL* a, int k, int *h)
-{
-    if (a == NULL)
-    {           // Si l'arbre est vide, crée un nouveau nœud
-        *h = 1; // La hauteur a augmenté
-        return creerAVL(k);
+AVL* equilibrerAVL(AVL* abr){
+    //Si l'AVL est penche trop à droite
+    if(abr->eq >= 2){
+        // On verifie si le sous arbre droit ne penche pas a gauche
+        if(abr->fd->eq >= 0){
+            return rotationGauche(abr);
+        }else{
+            return doubleRotationGauche(abr);
+        }
+    // Si l'AVL penche trop à gauche
+    }else if(abr->eq <= -2){
+        // On verifie si le sous arbre gauche ne penche pas a droite
+        if(abr->fg->eq <= 0){
+            return rotationDroite(abr);
+        }else{
+            return doubleRotationDroite(abr);
+        }
     }
-    else if (k < a->val->conso)
-    { // Si consommation est inférieure, insérer à gauche
-        a->fg = insertionAVL(a->fg, k, h);
-        *h = -*h; // Inverse l'impact de la hauteur
-    }
-    else if (k > a->val->conso)
-    { // Si la consommation est plus grande, insérer à droite
-        a->fd = insertionAVL(a->fd, k, h);
-    }
-    else
-    { // Élément déjà présent
+    return abr;
+}
+
+AVL* insertionAVL(AVL* abr,Station* s,int* h){
+    if(abr == NULL){
+        *h = 1;
+        return creerAVL(s);
+    }else if(s->identifiant < abr->station->identifiant){
+        abr->fg = insertionAVL(abr->fg, s, h);
+        *h = -*h
+    }else if(s->identifiant > abr->station->identifiant){
+        abr->fd = insertionAVL(abr->fd, s, h);
+    }else{
         *h = 0;
-        return a;
+        return abr;
     }
 
-    // Mise à jour du facteur d'équilibre et rééquilibrage si nécessaire
-    if (*h != 0)
-    {
-        a->eq += *h;
-        a = equilibrerAVL(a);
-        *h = (a->eq == 0) ? 0 : 1; // Mise à jour de la hauteur
+    if(*h != 0){
+        abr->eq = abr->eq + *h;
+        abr = equilibrerAVL(abr)
+        if(abr->eq = 0){
+            *h = 0;
+        }else{
+            *h = 1;
+        }
     }
-    return a;
+    return abr;
 }
+
+
+
 
 int sommeConsoHvb(AVL *a, AVL *b, int *somme) //retourne la somme de la consommation de la station 'a'
 {
