@@ -208,6 +208,49 @@ AVL* suppressionAVL(AVL* abr, int id, int* h) {
     return abr;
 }
 
+void insertionStation(AVL **abr, int colonneStation) {
+    Station *s;
+    int h;
+    int colonne = 0;
+    char* donnee;
+    char ligne[1024];  // Buffer pour lire chaque ligne du fichier
+    FILE* fichier = fopen("tmp/filtre_station.csv", "r");
+    if (fichier == NULL) {
+        printf("Erreur : fichier vide ou inaccessible.\n");
+        exit(0);
+    }
+    
+    while (fgets(ligne, sizeof(ligne), fichier)) {
+        colonne = 0;  // La colonne ou on est placée
+        s = malloc(sizeof(Station));
+        if (s == NULL) {
+            printf("Erreur d'allocation mémoire pour la station.\n");
+            exit(1);
+        }
+        
+        donnee = strtok(ligne, ";");
+        while (donnee != NULL) {
+            
+            if (colonne == colonneStation-1) {
+                s->identifiant = atoi(donnee);
+            }
+            
+            else if (colonne == 6) {
+                s->capacite = atoi(donnee);
+            }
+            colonne++;
+            donnee = strtok(NULL, ";");
+        }
+        s->consommation = 0;  
+        *abr = insertionAVL(*abr, s, &h);  // Insertion dans l'AVL
+    }
+    fclose(fichier);
+}
+
+
+
+
+
 // Affichage de l'AVL (ChatGPT pour vérifier si l'AVL fonctionne)
 void afficherAVL(AVL* a, int niveau) {
     if (a != NULL) {
@@ -220,48 +263,9 @@ void afficherAVL(AVL* a, int niveau) {
     }
 }
 
-void insertionStation(AVL **abr, int colonneStation) {
-    Station *s;
-    int h;
-    int colonne = 0;
-    char* donnee;
-    char ligne[1024];  // Buffer pour lire chaque ligne du fichier
-    FILE* file = fopen("tmp/filtre_station.csv", "r");
-    if (file == NULL) {
-        printf("Erreur : fichier vide ou inaccessible.\n");
-        exit(0);
-    }
-    
-    while (fgets(ligne, sizeof(ligne), file)) {
-        colonne = 0;  // Réinitialisation de la colonne à chaque ligne
-        s = malloc(sizeof(Station));
-        if (s == NULL) {
-            printf("Erreur d'allocation mémoire pour la station.\n");
-            exit(1);
-        }
-        
-        donnee = strtok(ligne, ";");
-        while (donnee != NULL) {
-            // La colonne 1 (index 1) contient l'identifiant de la station
-            if (colonne == 1) {
-                s->identifiant = atoi(donnee);
-            }
-            // La colonne 6 (index 6) contient la capacité de la station
-            else if (colonne == 6) {
-                s->capacite = atoi(donnee);
-            }
-            colonne++;
-            donnee = strtok(NULL, ";");
-        }
-        s->consommation = 0;  // Par défaut, consommation = 0
-        *abr = insertionAVL(*abr, s, &h);  // Insertion dans l'AVL
-    }
-    fclose(file);
-}
-
 int main() {
     AVL* arbre = NULL;
-    insertionStation(&arbre, 1);  // Passez l'adresse de l'arbre, la colonne 1 pour l'identifiant (index 1)
+    insertionStation(&arbre, 2);  // Passez l'adresse de l'arbre, la colonne 1 pour l'identifiant (index 1)
     afficherAVL(arbre, 0);  // Affiche l'arbre AVL
     return 0;
 }
