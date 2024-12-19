@@ -16,7 +16,15 @@ typedef struct avl
     int eq;             // Facteur d'équilibre 
 } AVL;
 
+// Fonction pour obtenir le maximum de deux nombres
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
 
+// Fonction pour obtenir le minimum de deux nombres
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
 
 AVL* creerAVL(Station* s)
 {
@@ -26,7 +34,7 @@ AVL* creerAVL(Station* s)
     // Si problème d'allocation, erreur
     if (nouv == NULL)
     {
-        printf("Erreur: Problème lors de l'allocation mémoire pour ajouter une nouvelle station à l'AVL.")
+        printf("Erreur: Problème lors de l'allocation mémoire pour ajouter une nouvelle station à l'AVL.");
         exit(1); 
     }
 
@@ -52,7 +60,7 @@ AVL* rotationGauche(AVL* abr){
 
     // On rééquilibre les noeud 
     abr->eq = eq_a - max(eq_p, 0) - 1;
-    p->eq = min( eq_a-2, eq_a+eq_p-2, eq_p-1 );
+    p->eq = min( min(eq_a-2, eq_a+eq_p-2), eq_p-1 );
     return p;
 }
 
@@ -69,7 +77,7 @@ AVL* rotationDroite(AVL* abr){
 
     // On rééquilibre les noeud 
     abr->eq = eq_a - min(eq_p, 0) + 1;
-    p->eq = max( eq_a+2, eq_a+eq_p+2, eq_p+1 );
+    p->eq = max( max(eq_a+2, eq_a+eq_p+2), eq_p+1 );
     return p;
 }
 
@@ -110,7 +118,7 @@ AVL* insertionAVL(AVL* abr,Station* s,int* h){
         return creerAVL(s);
     }else if(s->identifiant < abr->station->identifiant){
         abr->fg = insertionAVL(abr->fg, s, h);
-        *h = -*h
+        *h = -*h;
     }else if(s->identifiant > abr->station->identifiant){
         abr->fd = insertionAVL(abr->fd, s, h);
     }else{
@@ -120,7 +128,7 @@ AVL* insertionAVL(AVL* abr,Station* s,int* h){
 
     if(*h != 0){
         abr->eq = abr->eq + *h;
-        abr = equilibrerAVL(abr)
+        abr = equilibrerAVL(abr);
         if(abr->eq = 0){
             *h = 0;
         }else{
@@ -132,7 +140,7 @@ AVL* insertionAVL(AVL* abr,Station* s,int* h){
 
 // Suppression du minimum
 AVL* suppMinAVL(AVL* abr, int* h, Station** stationMin) {
-    AVL* tmp 
+    AVL* tmp;
     if (abr->fg == NULL) {
         *stationMin = abr->station;
         *h = -1;
@@ -170,35 +178,36 @@ AVL* suppressionAVL(AVL* abr, int id, int* h) {
         abr->fg = suppressionAVL(abr->fg, id, h);
         *h = -*h;
     } else {
-        if (a->fd != NULL) {
+        if (abr->fd != NULL) {
             Station* stationMin;
-            a->fd = suppMinAVL(a->fd, h, &stationMin);
-            a->station = stationMin;
+            abr->fd = suppMinAVL(abr->fd, h, &stationMin);
+            abr->station = stationMin;
         } else {
-            AVL* temp = a;
-            a = a->fg;
+            AVL* temp = abr;
+            abr = abr->fg;
             free(temp);
             *h = -1;
-            return a;
+            return abr;
         }
     }
 
-    if (a == NULL) {
+    if (abr == NULL) {
         return NULL;
     }
 
     if (*h != 0) {
-        a->eq += *h;
-        a = equilibrerAVL(a);
-        *h = (a->eq == 0) ? -1 : 0;
+        abr->eq += *h;
+        abr = equilibrerAVL(abr);
+        if(abr->eq == 0){
+            *h = -1;
+        }else{
+            *h = 0;
+        }
     }
-    return a;
+    return abr;
 }
 
-
-
-
-// Affichage de l'AVL
+// Affichage de l'AVL (ChatGPT pour vérifier si l'AVL fonctionne)
 void afficherAVL(AVL* a, int niveau) {
     if (a != NULL) {
         afficherAVL(a->fd, niveau + 1);
@@ -210,24 +219,37 @@ void afficherAVL(AVL* a, int niveau) {
     }
 }
 
-// Fonction principale pour test
+//(ChatGPT pour vérifier si l'AVL fonctionne)
 int main() {
     AVL* arbre = NULL;
     int h;
 
-    Station s1 = {1, 100, 0};
-    Station s2 = {2, 200, 0};
-    Station s3 = {3, 300, 0};
+    // Insertion de plusieurs stations pour construire un grand AVL
+    Station stations[] = {
+        {15, 150, 0}, {10, 100, 0}, {20, 200, 0},
+        {8, 80, 0}, {12, 120, 0}, {17, 170, 0},
+        {25, 250, 0}, {6, 60, 0}, {9, 90, 0},
+        {11, 110, 0}, {13, 130, 0}, {16, 160, 0},
+        {18, 180, 0}, {23, 230, 0}, {27, 270, 0}
+    };
 
-    arbre = insertionAVL(arbre, &s1, &h);
-    arbre = insertionAVL(arbre, &s2, &h);
-    arbre = insertionAVL(arbre, &s3, &h);
+    int n = sizeof(stations) / sizeof(stations[0]);
 
+    // Construire l'AVL avec toutes les stations
+    for (int i = 0; i < n; i++) {
+        arbre = insertionAVL(arbre, &stations[i], &h);
+    }
+
+    // Afficher l'arbre AVL avant suppression
     printf("Avant suppression :\n");
     afficherAVL(arbre, 0);
 
-    arbre = suppressionAVL(arbre, 2, &h);
+    // Supprimer certains nœuds
+    arbre = suppressionAVL(arbre, 10, &h);
+    arbre = suppressionAVL(arbre, 20, &h);
+    arbre = suppressionAVL(arbre, 15, &h);
 
+    // Afficher l'arbre AVL après suppression
     printf("Après suppression :\n");
     afficherAVL(arbre, 0);
 
