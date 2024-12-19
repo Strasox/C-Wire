@@ -253,6 +253,23 @@ void insertionStation(AVL **abr, int colonneStation) {
     fclose(fichier);
 }
 
+AVL* modifierAVL(AVL* abr, int idStation, int somme){
+    if(abr == NULL){
+        printf("erreur : arbre vide");
+        exit(1);
+    }
+    if (abr->station->identifiant == idStation){
+        abr->station->consommation = somme;
+    }
+    else if(abr->station->identifiant < idStation){
+        abr->fd = modifierAVL(abr->fd, idStation, somme);
+    }
+    else{
+        abr->fg = modifierAVL(abr->fg, idStation, somme);
+    }
+    return abr;
+}
+
 void calculConso(AVL* abr, int colonneStation) {
     int colonne = 0;
     int somme = 0;      
