@@ -219,6 +219,36 @@ void afficherAVL(AVL* a, int niveau) {
     }
 }
 
+void insertionStation(AVL *abr, int colonneStation){
+    Station *s;
+    int h;
+    int ligne = 0;
+    int colonne = 0;
+    char* donnee;
+    FILE* file = fopen("filtre_station.csv", "w+");
+    if (file == NULL){
+        printf("erreur : fichier vide");
+        exit(0);
+    }
+    while( feof( "filtre_station.csv")){
+        ligne += 1; 
+        donnee = strtok(ligne, ";");
+        while(donnee != NULL){
+            if (colonne == colonneStation){
+                s->identifiant = atoi(donnee);
+            }
+            else if(colonne == 7){
+                s->capacite = atoi(donnee);
+            }
+            colonne += 1;
+            donnee = strtok(NULL, ";");
+        }
+        s->consommation = 0;
+        abr = insertionAVL(abr, s, &h);
+    }
+    fclose( file );   
+}
+
 int main() {
     AVL* arbre = NULL;
     int h;
