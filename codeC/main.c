@@ -10,7 +10,7 @@ typedef struct
 
 typedef struct avl
 {
-    Station* station;   // pointeur vers les valeurs du nœud
+    Station* station;   // Pointeur vers une station
     struct avl* fg;     // Pointeur vers le fils gauche
     struct avl* fd;     // Pointeur vers le fils droit
     int eq;             // Facteur d'équilibre 
@@ -18,19 +18,20 @@ typedef struct avl
 
 
 
-AVL* creerAVL(int id, int capacite)
+AVL* creerAVL(Station* s)
 {
-    // Alloue de la mémoire pour un nouveau nœud
+    // Allocation de la mémoire pour un nouveau noeud dans l'AVL d'une station
     AVL* nouv = (AVL*)malloc(sizeof(AVL));
+
+    // Si problème d'allocation, erreur
     if (nouv == NULL)
     {
-        exit(1); // Arrêt immédiat en cas d'erreur d'allocation
+        printf("Erreur: Problème lors de l'allocation mémoire pour ajouter une nouvelle station à l'AVL.")
+        exit(1); 
     }
 
     // Initialisation des valeurs de base
-    nouv->station->identifiant = id;
-    nouv->station->capacite = capacite;
-    nouv->station->consommation = 0;
+    nouv->station = s;
     nouv->fg = NULL; // Pas de fils gauche
     nouv->fd = NULL; // Pas de fils droit
     nouv->eq = 0;    // Facteur d'équilibre initialisé à 0
@@ -129,102 +130,106 @@ AVL* insertionAVL(AVL* abr,Station* s,int* h){
     return abr;
 }
 
-
-
-
-int sommeConsoHvb(AVL *a, AVL *b, int *somme) //retourne la somme de la consommation de la station 'a'
-{
-    if (a == NULL)
-    {
-        return 0;
+// Suppression du minimum
+AVL* suppMinAVL(AVL* abr, int* h, Station** stationMin) {
+    AVL* tmp 
+    if (abr->fg == NULL) {
+        *stationMin = abr->station;
+        *h = -1;
+        tmp = abr;
+        abr = abr->fd;
+        free(tmp);
+        return abr;
+    }else{
+        abr->fg = suppMinAVL(abr->fg, h, stationMin);
+        *h = -*h;
     }
-    if (b->val->centrale != a->val->centrale)
-    {
-        return 0;
-    }
-    if (a->val->hvb != NULL && a->val->hvb == b->val->hvb)
-    {
-        somme += b->val->conso; //somme des grandes entreprises
-        if (b->fg != NULL)
-        {
-            b->fg = sommeConso(a, b->fg, somme);
+
+    if (*h != 0) {
+        abr->eq = abr->eq + *h;
+        // abr = equilibrerAVL(abr);
+        if(abr->eq = 0){
+            *h = -1;
+        }else{
+            *h = 0;
         }
-        if (b->fd != NULL)
-        {
-            b->fd = sommeConso(a, b->fd , somme);
-        }
-        return somme;
     }
-    else
-    {
-        return 0;
+    return abr;
+}
+
+// Suppression
+AVL* suppressionAVL(AVL* abr, int id, int* h) {
+    if (abr == NULL) {
+        *h = 0;
+        return abr;
+    }
+
+    if (id > abr->station->identifiant) {
+        abr->fd = suppressionAVL(abr->fd, id, h);
+    }else if (id < abr->station->identifiant){
+        abr->fg = suppressionAVL(abr->fg, id, h);
+        *h = -*h;
+    } else {
+        if (a->fd != NULL) {
+            Station* stationMin;
+            a->fd = suppMinAVL(a->fd, h, &stationMin);
+            a->station = stationMin;
+        } else {
+            AVL* temp = a;
+            a = a->fg;
+            free(temp);
+            *h = -1;
+            return a;
+        }
+    }
+
+    if (a == NULL) {
+        return NULL;
+    }
+
+    if (*h != 0) {
+        a->eq += *h;
+        a = equilibrerAVL(a);
+        *h = (a->eq == 0) ? -1 : 0;
+    }
+    return a;
+}
+
+
+
+
+// Affichage de l'AVL
+void afficherAVL(AVL* a, int niveau) {
+    if (a != NULL) {
+        afficherAVL(a->fd, niveau + 1);
+        for (int i = 0; i < niveau; i++) {
+            printf("    ");
+        }
+        printf("[%d, %d]\n", a->station->identifiant, a->eq);
+        afficherAVL(a->fg, niveau + 1);
     }
 }
 
-int sommeConsoHva(AVL *a, AVL *b, int *somme) //retourne la somme de la consommation de la station 'a'
-{
-    if (a == NULL)
-    {
-        return 0;
-    }
-    if (b->val->centrale != a->val->centrale)
-    {
-        return 0;
-    }
-    if (a->val->hvb != NULL && a->val->hvb == b->val->hvb)
-    {
-        if ( a->val->hva != NULL && a->val->hva == b->val->hva)
-        {
-            somme += b->val->conso; //somme de conso 
-            if (b->fg != NULL)
-            {
-                b->fg = sommeConso(a, b->fg, somme);
-            }
-            if (b->fd != NULL)
-            {
-                b->fd = sommeConso(a, b->fd , somme);
-            }
-            return somme;
-        }
-    }
-    else
-    {
-        return 0;
-    }
-}
+// Fonction principale pour test
+int main() {
+    AVL* arbre = NULL;
+    int h;
 
-int sommeConsoLv(AVL *a, AVL *b, int *somme) //retourne la somme de la consommation de la station 'a'
-{
-    if (a == NULL)
-    {
-        return 0;
-    }
-    if (b->val->centrale != a->val->centrale)
-    {
-        return 0;
-    }
-    if (a->val->hvb != NULL && a->val->hvb == b->val->hvb)
-    {
-        if ( a->val->hva != NULL && a->val->hva == b->val->hva) //test si la station a existe et si b est issu de la même station que a
-        {
-            if ( a->val->lv != NULL && a->val->lv == b->val->lv )
-            {
-                somme += b->val->conso; //somme de conso 
-                if (b->fg != NULL)
-                {
-                    b->fg = sommeConso(a, b->fg, somme);
-                }
-                if (b->fd != NULL)
-                {
-                    b->fd = sommeConso(a, b->fd , somme);
-                }
-                return somme;
-            }
-        }
-    }
-    else
-    {
-        return 0;
-    }
-}
+    Station s1 = {1, 100, 0};
+    Station s2 = {2, 200, 0};
+    Station s3 = {3, 300, 0};
 
+    arbre = insertionAVL(arbre, &s1, &h);
+    arbre = insertionAVL(arbre, &s2, &h);
+    arbre = insertionAVL(arbre, &s3, &h);
+
+    printf("Avant suppression :\n");
+    afficherAVL(arbre, 0);
+
+    arbre = suppressionAVL(arbre, 2, &h);
+
+    printf("Après suppression :\n");
+    afficherAVL(arbre, 0);
+
+    return 0;
+}

@@ -71,7 +71,7 @@ fi
 if [[ "$3" != "comp" && "$3" != "indiv" && "$3" != "all" ]]; then
     affiche_-h
     affiche_temps
-    echo "Erreur: Le parametre type de consomateur n'est pas 'comp','indiv' ou 'all' et n'est donc pas valide."
+    echo "Erreur: Le parametre type de consommateur n'est pas 'comp','indiv' ou 'all' et n'est donc pas valide."
     exit 4
 fi
 
@@ -79,7 +79,7 @@ fi
 if [[ ("$2" == "hvb" || "$2" == "hva") && ( "$3" == "all" || "$3" == "indiv" ) ]]; then
     affiche_-h
     affiche_temps
-    echo "Erreur: Le parametre type de station et type de consomateur ne sont pas compatible."
+    echo "Erreur: Le parametre type de station et type de consommateur ne sont pas compatible."
     exit 5
 fi
 
@@ -144,12 +144,12 @@ case "$2" in
         exit 10 ;;
 esac
 
-# On defini la collone des consomateur que l'on regarde
+# On defini la collone des consommateur que l'on regarde
 case "$3" in
-    "comp") consomateur_colonne=5 ;;
-    "indiv") consomateur_colonne=6 ;;
-    "all") consomateur_colonne="all" ;;
-    *) echo "Erreur: Le parametre type de consomateur a un probmeme."
+    "comp") consommateur_colonne=5 ;;
+    "indiv") consommateur_colonne=6 ;;
+    "all") consommateur_colonne="all" ;;
+    *) echo "Erreur: Le parametre type de consommateur a un probmeme."
         affiche_temps
         exit 11 ;;
 esac
@@ -161,26 +161,26 @@ if [ ! -z "$4" ]; then
     #critère dans un fichier (Aide: ChatGPT,IBM,Funix,StackOverflow,Redit)
     awk -F';' -v central="$4" -v station_colonne="$station_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $(station_colonne+1) == "-" && $8 == "-"' "$1" > tmp/filtre_station.csv
 
-    #Si on prend tout les consomateur
-    if [ $consomateur_colonne == "all" ]; then 
-        #On enregistre dans un fichier les consomateur, selon la central, la colonne de la station recherché et la consomation doit être différent de rien (-)
-        awk -F';' -v central="$4" -v station_colonne="$station_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $8 != "-"' "$1" > tmp/filtre_consomateur.csv
+    #Si on prend tout les consommateur
+    if [ $consommateur_colonne == "all" ]; then 
+        #On enregistre dans un fichier les consommateur, selon la central, la colonne de la station recherché et la consomation doit être différent de rien (-)
+        awk -F';' -v central="$4" -v station_colonne="$station_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $8 != "-"' "$1" > tmp/filtre_consommateur.csv
     else
-        #Meme chose mais on à un consomateur spécifique donc on vérifie la colone des consomateur
-        awk -F';' -v central="$4" -v station_colonne="$station_colonne" -v consomateur="$consomateur_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $consomateur != "-"' "$1" > tmp/filtre_consomateur.csv
+        #Meme chose mais on à un consommateur spécifique donc on vérifie la colone des consommateur
+        awk -F';' -v central="$4" -v station_colonne="$station_colonne" -v consommateur="$consommateur_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $consommateur != "-"' "$1" > tmp/filtre_consommateur.csv
     fi
 else
     #Meme chose mais sans filtrer par central
     awk -F';' -v station_colonne="$station_colonne" 'NR > 1 && $(station_colonne) != "-" && $(station_colonne+1) == "-" && $8 == "-"' "$1" > tmp/filtre_station.csv
-    if [ $consomateur_colonne == "all" ]; then 
-        awk -F';' -v station_colonne="$station_colonne" 'NR > 1 && $(station_colonne) != "-" && $8 != "-"' "$1" > tmp/filtre_consomateur.csv
+    if [ $consommateur_colonne == "all" ]; then 
+        awk -F';' -v station_colonne="$station_colonne" 'NR > 1 && $(station_colonne) != "-" && $8 != "-"' "$1" > tmp/filtre_consommateur.csv
     else
-        awk -F';' -v station_colonne="$station_colonne" -v consomateur="$consomateur_colonne" 'NR > 1 && $(station_colonne) != "-" && $consomateur != "-"' "$1" > tmp/filtre_consomateur.csv
+        awk -F';' -v station_colonne="$station_colonne" -v consommateur="$consommateur_colonne" 'NR > 1 && $(station_colonne) != "-" && $consommateur != "-"' "$1" > tmp/filtre_consommateur.csv
     fi
 fi
 
 #On execute les programes C
-./codeC/exec tmp/filtre_station.csv tmp/filtre_consomateur.csv
+./codeC/exec $station_colonne tmp/filtre_station.csv tmp/filtre_consommateur.csv 
 
 #Verif à rajouter pour l'exec ??
 
