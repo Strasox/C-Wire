@@ -344,10 +344,10 @@ void afficherAVL(AVL* a, int niveau) {
     }
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     AVL* arbre = NULL;
-    insertionStation(&arbre, 4);  // Passez l'adresse de l'arbre, la colonne 1 pour l'identifiant (index 1)
-    calculConso(arbre,4);
+    insertionStation(&arbre, atoi(argv[1]));  // Passez l'adresse de l'arbre, la colonne 1 pour l'identifiant (index 1)
+    calculConso(arbre,atoi(argv[1]));
     afficherAVL(arbre, 0);  // Affiche l'arbre AVL
     return 0;
 }
