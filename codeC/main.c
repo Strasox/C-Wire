@@ -5,8 +5,8 @@
 typedef struct 
 {
     int identifiant;  // Identifiant d'un station
-    int capacite;     // Capacité d'une station
-    int consommation; // Consomation à calculer d'une station
+    long int capacite;     // Capacité d'une station
+    long int consommation; // Consomation à calculer d'une station
 }Station;
 
 typedef struct avl
@@ -242,7 +242,7 @@ void insertionStation(AVL **abr, int colonneStation) {
             }
             
             else if (colonne == 6) {
-                s->capacite = atoi(donnee);
+                s->capacite = atol(donnee);
             }
             colonne++;
             donnee = strtok(NULL, ";");
@@ -272,7 +272,7 @@ AVL* modifierAVL(AVL* abr, int idStation, int somme){
 
 void calculConso(AVL* abr, int colonneStation) {
     int colonne = 0;
-    int somme = 0;      
+    long int somme = 0;      
     int idStation = -1; 
     int tmp = 0;        // Variable pour séparé les consommateurs par station
     char* donnee;
@@ -307,10 +307,10 @@ void calculConso(AVL* abr, int colonneStation) {
             // Si on est à la colonne des consommations (colonne 7)
             else if (colonne == 7) {
                 if (tmp == 0) {
-                    abr = modificationAVL(abr, idStation, somme);  // Insertion dans l'AVL
-                    somme = atoi(donnee);  // Si tmp est 0, on initialise la consommation
+                    abr = modifierAVL(abr, idStation, somme);  // Insertion dans l'AVL
+                    somme = atol(donnee);  // Si tmp est 0, on initialise la consommation
                 } else {
-                    somme += atoi(donnee);  // Si tmp est 1, on ajoute à la consommation
+                    somme += atol(donnee);  // Si tmp est 1, on ajoute à la consommation
                 }
             }
 
@@ -319,7 +319,7 @@ void calculConso(AVL* abr, int colonneStation) {
             
         }
         // Une fois que l'on a terminé une ligne, on met à jour l'AVL avec la consommation
-        abr = modificationAVL(abr, idStation, somme);  // Insertion dans l'AVL
+        abr = modifierAVL(abr, idStation, somme);  // Insertion dans l'AVL
         
     }
 
@@ -339,14 +339,15 @@ void afficherAVL(AVL* a, int niveau) {
         for (int i = 0; i < niveau; i++) {
             printf("    ");
         }
-        printf("[%d, %d]\n", a->station->identifiant, a->eq);
+        printf("[%d, %ld, %ld]\n", a->station->identifiant,a->station->capacite, a->station->consommation);
         afficherAVL(a->fg, niveau + 1);
     }
 }
 
 int main() {
     AVL* arbre = NULL;
-    insertionStation(&arbre, 2);  // Passez l'adresse de l'arbre, la colonne 1 pour l'identifiant (index 1)
+    insertionStation(&arbre, 4);  // Passez l'adresse de l'arbre, la colonne 1 pour l'identifiant (index 1)
+    calculConso(arbre,4);
     afficherAVL(arbre, 0);  // Affiche l'arbre AVL
     return 0;
 }
