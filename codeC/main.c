@@ -16,12 +16,12 @@ typedef struct avl
     int eq;             // Facteur d'équilibre 
 } AVL;
 
-// Fonction pour obtenir le maximum de deux nombres
+// Fonction pour obtenir le maximum
 int max(int a, int b) {
     return (a > b) ? a : b;
 }
 
-// Fonction pour obtenir le minimum de deux nombres
+// Fonction pour obtenir le minimum 
 int min(int a, int b) {
     return (a < b) ? a : b;
 }
@@ -52,15 +52,15 @@ AVL* rotationGauche(AVL* abr){
     // On initialise le pivot
     AVL* p = abr->fd;
     int eq_a = abr->eq;
-    int eq_p = abr->eq;
+    int eq_p = p->eq;
 
     // On rééquilibre l'AVL
     abr->fd = p->fg;
     p->fg = abr;
 
-    // On rééquilibre les noeud 
+    // On rééquilibre les noeuds 
     abr->eq = eq_a - max(eq_p, 0) - 1;
-    p->eq = min( min(eq_a-2, eq_a+eq_p-2), eq_p-1 );
+    p->eq = min(min(eq_a - 2, eq_a + eq_p - 2), eq_p - 1);
     return p;
 }
 
@@ -69,15 +69,15 @@ AVL* rotationDroite(AVL* abr){
     // On initialise le pivot
     AVL* p = abr->fg;
     int eq_a = abr->eq;
-    int eq_p = abr->eq;
+    int eq_p = p->eq;
 
     // On rééquilibre l'AVL
     abr->fg = p->fd;
     p->fd = abr;
 
-    // On rééquilibre les noeud 
+    // On rééquilibre les noeuds 
     abr->eq = eq_a - min(eq_p, 0) + 1;
-    p->eq = max( max(eq_a+2, eq_a+eq_p+2), eq_p+1 );
+    p->eq = max(max(eq_a + 2, eq_a + eq_p + 2), eq_p + 1);
     return p;
 }
 
@@ -92,9 +92,9 @@ AVL* doubleRotationGauche(AVL* abr){
 }
 
 AVL* equilibrerAVL(AVL* abr){
-    //Si l'AVL est penche trop à droite
+    // Si l'AVL est penché trop à droite
     if(abr->eq >= 2){
-        // On verifie si le sous arbre droit ne penche pas a gauche
+        // On vérifie si le sous-arbre droit ne penche pas à gauche
         if(abr->fd->eq >= 0){
             return rotationGauche(abr);
         }else{
@@ -102,7 +102,7 @@ AVL* equilibrerAVL(AVL* abr){
         }
     // Si l'AVL penche trop à gauche
     }else if(abr->eq <= -2){
-        // On verifie si le sous arbre gauche ne penche pas a droite
+        // On vérifie si le sous-arbre gauche ne penche pas à droite
         if(abr->fg->eq <= 0){
             return rotationDroite(abr);
         }else{
@@ -129,7 +129,7 @@ AVL* insertionAVL(AVL* abr,Station* s,int* h){
     if(*h != 0){
         abr->eq = abr->eq + *h;
         abr = equilibrerAVL(abr);
-        if(abr->eq = 0){
+        if(abr->eq == 0){
             *h = 0;
         }else{
             *h = 1;
@@ -155,8 +155,8 @@ AVL* suppMinAVL(AVL* abr, int* h, Station** stationMin) {
 
     if (*h != 0) {
         abr->eq = abr->eq + *h;
-        // abr = equilibrerAVL(abr);
-        if(abr->eq = 0){
+        abr = equilibrerAVL(abr);
+        if(abr->eq == 0){
             *h = -1;
         }else{
             *h = 0;
@@ -219,7 +219,6 @@ void afficherAVL(AVL* a, int niveau) {
     }
 }
 
-//(ChatGPT pour vérifier si l'AVL fonctionne)
 int main() {
     AVL* arbre = NULL;
     int h;
