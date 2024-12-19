@@ -173,20 +173,26 @@ AVL* suppressionAVL(AVL* abr, int id, int* h) {
         return abr;
     }
 
+    
     if (id > abr->station->identifiant) {
         abr->fd = suppressionAVL(abr->fd, id, h);
-    }else if (id < abr->station->identifiant){
+    } else if (id < abr->station->identifiant){
         abr->fg = suppressionAVL(abr->fg, id, h);
         *h = -*h;
     } else {
+        
         if (abr->fd != NULL) {
+            
             Station* stationMin;
             abr->fd = suppMinAVL(abr->fd, h, &stationMin);
+            
             abr->station = stationMin;
         } else {
+            
             AVL* temp = abr;
-            abr = abr->fg;
-            free(temp);
+            abr = abr->fg;  
+            free(temp->station); 
+            free(temp);          
             *h = -1;
             return abr;
         }
@@ -199,9 +205,9 @@ AVL* suppressionAVL(AVL* abr, int id, int* h) {
     if (*h != 0) {
         abr->eq += *h;
         abr = equilibrerAVL(abr);
-        if(abr->eq == 0){
+        if (abr->eq == 0) {
             *h = -1;
-        }else{
+        } else {
             *h = 0;
         }
     }
@@ -247,51 +253,64 @@ void insertionStation(AVL **abr, int colonneStation) {
     fclose(fichier);
 }
 
-void calculConso( AVL* abr, int colonneStation){
+void calculConso(AVL* abr, int colonneStation) {
     int colonne = 0;
-    int somme;
-    int idStation;
-    int tmp;
+    int somme = 0;      
+    int idStation = -1; 
+    int tmp = 0;        // Variable pour séparé les consommateurs par station
     char* donnee;
     char ligne[1024];  // Buffer pour lire chaque ligne du fichier
-    FILE* fichier = fopen("tmp/filtre_station.csv", "r");
+
+    // Ouvre le fichier pour lecture
+    FILE* fichier = fopen("tmp/filtre_consommateur.csv", "r");
     if (fichier == NULL) {
         printf("Erreur : fichier vide ou inaccessible.\n");
         exit(0);
     }
-    
+
+    // Parcours chaque ligne du fichier
     while (fgets(ligne, sizeof(ligne), fichier)) {
         colonne = 0;  // La colonne ou on est placée
-        s = malloc(sizeof(Station));
-        if (s == NULL) {
-            printf("Erreur d'allocation mémoire pour la station.\n");
-            exit(1);
-        }
         
         donnee = strtok(ligne, ";");
         while (donnee != NULL) {
             
-            if (colonne == colonneStation-1) {
-                if ( idStation == NULL || idStation != atoi(donnee)){
-                    idStation = atoi(donnee);
-                    tmp = 0;
+            // Vérifie si on est à la colonne qui contient l'identifiant de la station
+            if (colonne == colonneStation - 1) {
+                // Si on change de station, on réinitialise la consommation
+                if (idStation == -1 || idStation != atoi(donnee)) {
+                    idStation = atoi(donnee);  // Met à jour idStation
+                    tmp = 0;  // Nouvelle station, réinitialisation de tmp
+                    somme = 0;  // Réinitialise la consommation
+                } else {
+                    tmp = 1;  // Si c'est la même station, tmp est mis à 1
                 }
-                else{
-                    tmp = 1;
-                }
-            
-            else if (colonne == 7) {
-                
-                somme += atoi(donnee);
             }
-            colonne++;
-            donnee = strtok(NULL, ";");
+
+            // Si on est à la colonne des consommations (colonne 7)
+            else if (colonne == 7) {
+                if (tmp == 0) {
+                    abr = modificationAVL(abr, idStation, somme);  // Insertion dans l'AVL
+                    somme = atoi(donnee);  // Si tmp est 0, on initialise la consommation
+                } else {
+                    somme += atoi(donnee);  // Si tmp est 1, on ajoute à la consommation
+                }
+            }
+
+            colonne++;  // On passe à la colonne suivante
+            donnee = strtok(NULL, ";");  // On récupère le prochain token
+            
         }
-        s->consommation = 0;  
-        *abr = mofificationAVL(abr, idStation, somme);  // Insertion dans l'AVL
+        // Une fois que l'on a terminé une ligne, on met à jour l'AVL avec la consommation
+        abr = modificationAVL(abr, idStation, somme);  // Insertion dans l'AVL
+        
     }
-    fclose(fichier);
+
+    fclose(fichier);  // Fermeture du fichier après traitement
 }
+
+
+
 
 
 
