@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct 
 {
@@ -219,68 +220,48 @@ void afficherAVL(AVL* a, int niveau) {
     }
 }
 
-void insertionStation(AVL *abr, int colonneStation){
+void insertionStation(AVL **abr, int colonneStation) {
     Station *s;
     int h;
-    int ligne = 0;
     int colonne = 0;
     char* donnee;
-    FILE* file = fopen("filtre_station.csv", "w+");
-    if (file == NULL){
-        printf("erreur : fichier vide");
+    char ligne[1024];  // Buffer pour lire chaque ligne du fichier
+    FILE* file = fopen("tmp/filtre_station.csv", "r");
+    if (file == NULL) {
+        printf("Erreur : fichier vide ou inaccessible.\n");
         exit(0);
     }
-    while( feof( "filtre_station.csv")){
-        ligne += 1; 
+    
+    while (fgets(ligne, sizeof(ligne), file)) {
+        colonne = 0;  // Réinitialisation de la colonne à chaque ligne
+        s = malloc(sizeof(Station));
+        if (s == NULL) {
+            printf("Erreur d'allocation mémoire pour la station.\n");
+            exit(1);
+        }
+        
         donnee = strtok(ligne, ";");
-        while(donnee != NULL){
-            if (colonne == colonneStation){
+        while (donnee != NULL) {
+            // La colonne 1 (index 1) contient l'identifiant de la station
+            if (colonne == 1) {
                 s->identifiant = atoi(donnee);
             }
-            else if(colonne == 7){
+            // La colonne 6 (index 6) contient la capacité de la station
+            else if (colonne == 6) {
                 s->capacite = atoi(donnee);
             }
-            colonne += 1;
+            colonne++;
             donnee = strtok(NULL, ";");
         }
-        s->consommation = 0;
-        abr = insertionAVL(abr, s, &h);
+        s->consommation = 0;  // Par défaut, consommation = 0
+        *abr = insertionAVL(*abr, s, &h);  // Insertion dans l'AVL
     }
-    fclose( file );   
+    fclose(file);
 }
 
 int main() {
     AVL* arbre = NULL;
-    int h;
-
-    // Insertion de plusieurs stations pour construire un grand AVL
-    Station stations[] = {
-        {15, 150, 0}, {10, 100, 0}, {20, 200, 0},
-        {8, 80, 0}, {12, 120, 0}, {17, 170, 0},
-        {25, 250, 0}, {6, 60, 0}, {9, 90, 0},
-        {11, 110, 0}, {13, 130, 0}, {16, 160, 0},
-        {18, 180, 0}, {23, 230, 0}, {27, 270, 0}
-    };
-
-    int n = sizeof(stations) / sizeof(stations[0]);
-
-    // Construire l'AVL avec toutes les stations
-    for (int i = 0; i < n; i++) {
-        arbre = insertionAVL(arbre, &stations[i], &h);
-    }
-
-    // Afficher l'arbre AVL avant suppression
-    printf("Avant suppression :\n");
-    afficherAVL(arbre, 0);
-
-    // Supprimer certains nœuds
-    arbre = suppressionAVL(arbre, 10, &h);
-    arbre = suppressionAVL(arbre, 20, &h);
-    arbre = suppressionAVL(arbre, 15, &h);
-
-    // Afficher l'arbre AVL après suppression
-    printf("Après suppression :\n");
-    afficherAVL(arbre, 0);
-
+    insertionStation(&arbre, 1);  // Passez l'adresse de l'arbre, la colonne 1 pour l'identifiant (index 1)
+    afficherAVL(arbre, 0);  // Affiche l'arbre AVL
     return 0;
 }
