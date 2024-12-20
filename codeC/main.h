@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "fonctions.h"
-#include "structures.h"
+#include "structure.h"
 
 
 

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "structure.h"
 
 
 // Fonction pour obtenir le maximum
@@ -43,10 +44,12 @@ AVL* modifierAVL(AVL* abr, int idStation, int somme);
 //Calcul la consommation d'un type de station en ddonnant la somme de tout les consommateurs
 void calculConso(AVL* abr, int colonneStation);
 
+void creerFichier(AVL* abr,char* s,char* c,char* central);
+
 // Affichage de l'AVL (ChatGPT pour vérifier si l'AVL fonctionne)
 void afficherAVL(AVL* a, int niveau);
 
-void interface(int argc, char *argv[]);
+void interface(char *argv[]);
 
 
 #endif
