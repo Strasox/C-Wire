@@ -46,7 +46,7 @@ void calculConso(AVL* abr, int colonneStation);
 // Affichage de l'AVL (ChatGPT pour vérifier si l'AVL fonctionne)
 void afficherAVL(AVL* a, int niveau);
 
-int interface(int argc, char *argv[]);
+void interface(int argc, char *argv[]);
 
 
 #endif
