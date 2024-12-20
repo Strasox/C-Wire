@@ -25,4 +25,4 @@ Les options `(hvb, hva)` ne sont **pas compatibles** avec `(all, indiv)` et ne s
 ## Auteurs
 
 - **Alex Mikolajewski** - [GitHub](https://github.com/Strasox)
-- 
+- **Alexis Guimbard** - [GitHub](https://github.com/AlexisG115)
