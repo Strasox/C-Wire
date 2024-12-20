@@ -174,6 +174,9 @@ if [ ! -z "$4" ]; then
         #Meme chose mais on à un consommateur spécifique donc on vérifie la colone des consommateur
         awk -F';' -v central="$4" -v station_colonne="$station_colonne" -v consommateur="$consommateur_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $consommateur != "-"' "$1" > tmp/filtre_consommateur.csv
     fi
+
+    #On execute les programes C
+    ./codeC/exec $2 $3 $4
 else
     #Meme chose mais sans filtrer par central
     awk -F';' -v station_colonne="$station_colonne" 'NR > 1 && $(station_colonne) != "-" && $(station_colonne+1) == "-" && $8 == "-"' "$1" > tmp/filtre_station.csv
@@ -182,10 +185,12 @@ else
     else
         awk -F';' -v station_colonne="$station_colonne" -v consommateur="$consommateur_colonne" 'NR > 1 && $(station_colonne) != "-" && $consommateur != "-"' "$1" > tmp/filtre_consommateur.csv
     fi
+
+    #On execute les programes C
+    ./codeC/exec $2 $3 Vide
 fi
 
-#On execute les programes C
-./codeC/exec $2 $3 $4
+
 
 #Verif de l'exec
 if [ $? != 0 ]; then

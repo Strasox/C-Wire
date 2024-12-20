@@ -166,54 +166,6 @@ AVL* suppMinAVL(AVL* abr, int* h, Station** stationMin) {
     return abr;
 }
 
-// Suppression
-AVL* suppressionAVL(AVL* abr, int id, int* h) {
-    if (abr == NULL) {
-        *h = 0;
-        return abr;
-    }
-
-    
-    if (id > abr->station->identifiant) {
-        abr->fd = suppressionAVL(abr->fd, id, h);
-    } else if (id < abr->station->identifiant){
-        abr->fg = suppressionAVL(abr->fg, id, h);
-        *h = -*h;
-    } else {
-        
-        if (abr->fd != NULL) {
-            
-            Station* stationMin;
-            abr->fd = suppMinAVL(abr->fd, h, &stationMin);
-            
-            abr->station = stationMin;
-        } else {
-            
-            AVL* temp = abr;
-            abr = abr->fg;  
-            free(temp->station); 
-            free(temp);          
-            *h = -1;
-            return abr;
-        }
-    }
-
-    if (abr == NULL) {
-        return NULL;
-    }
-
-    if (*h != 0) {
-        abr->eq += *h;
-        abr = equilibrerAVL(abr);
-        if (abr->eq == 0) {
-            *h = -1;
-        } else {
-            *h = 0;
-        }
-    }
-    return abr;
-}
-
 void insertionStation(AVL **abr, int colonneStation) {
     Station *s;
     int h;
@@ -327,35 +279,54 @@ void calculConso(AVL* abr, int colonneStation) {
 }
 
 
-void creerFichier(AVL* abr,char* s,char* c){
+void creerFichier(AVL* abr,char* s,char* c,char* central){
     char nomfichier[50];
     strcpy(nomfichier, "tests/");
     strcat(nomfichier, s);
     strcat(nomfichier, "_");
     strcat(nomfichier, c);
+    if(!(strcmp(central, "Vide") == 0)){
+        strcat(nomfichier, "_");
+        strcat(nomfichier, central);
+    }
     strcat(nomfichier, ".csv");
-    printf("%s",nomfichier);
+
     FILE* fichier = fopen(nomfichier, "w");
     if (fichier == NULL) {
         printf("Erreur: Impossible de créer le fichier");
         exit(1);
     }
+
+    if(strcmp(s, "hvb") == 0){
+        fprintf(fichier, "%s:", "Station HV-B");
+    }else if(strcmp(s, "hva") == 0){
+        fprintf(fichier, "%s:", "Station HV-A");
+    }else if(strcmp(s, "lv") == 0){
+        fprintf(fichier, "%s:", "Station LV");
+    }
+    fprintf(fichier, "%s:", "Capacité");
+    if(strcmp(c, "comp") == 0){
+        fprintf(fichier, "%s\n", "Consommation (entreprises)");
+    }else if(strcmp(c, "indiv") == 0){
+        fprintf(fichier, "%s\n", "Consommation (particuliers)");
+    }else if(strcmp(c, "all") == 0){
+        fprintf(fichier, "%s\n", "Consommation (tous)");
+    }
+
     Station* temp;
     int h;
 
     while(abr != NULL){
         abr = suppMinAVL(abr,&h,&temp);
-        
-
+        fprintf(fichier, "%d:", temp->identifiant);
+        fprintf(fichier, "%ld:", temp->capacite);
+        fprintf(fichier, "%ld\n", temp->consommation);
 
         free(temp);
     }
     
     fclose(fichier);
 }
-
-
-
 
 // Affichage de l'AVL (ChatGPT pour vérifier si l'AVL fonctionne)
 void afficherAVL(AVL* a, int niveau) {
@@ -383,6 +354,6 @@ int main(int argc, char *argv[]) {
     insertionStation(&arbre, s);  // Passez l'adresse de l'arbre, la colonne 1 pour l'identifiant (index 1)
     calculConso(arbre,s);
     afficherAVL(arbre, 0);  // Affiche l'arbre AVL
-    creerFichier(arbre,argv[1],argv[2]);
+    creerFichier(arbre,argv[1],argv[2],argv[3]);
     return 0;
 }
