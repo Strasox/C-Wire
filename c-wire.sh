@@ -134,6 +134,11 @@ if [ ! -d "graphs" ]; then
     mkdir graphs
 fi
 
+# Vérification de la présence de tests et création si il n'existe pas
+if [ ! -d "tests" ]; then
+    mkdir tests
+fi
+
 # On defini la collone des station que l'on regarde
 case "$2" in
     "hvb") station_colonne=2 ;;
@@ -180,9 +185,15 @@ else
 fi
 
 #On execute les programes C
-./codeC/exec $station_colonne tmp/filtre_station.csv tmp/filtre_consommateur.csv 
+./codeC/exec $2 $3 $4
 
-#Verif à rajouter pour l'exec ??
+#Verif de l'exec
+if [ $? != 0 ]; then
+    echo "Erreur: L'execution de exec à rencontrer un problème."
+    affiche_temps
+    exit 12
+fi
+
 
 affiche_temps
 echo "Fin du Programme"
