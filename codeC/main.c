@@ -327,7 +327,32 @@ void calculConso(AVL* abr, int colonneStation) {
 }
 
 
+void creerFichier(AVL* abr,char* s,char* c){
+    char nomfichier[50];
+    strcpy(nomfichier, "tests/");
+    strcat(nomfichier, s);
+    strcat(nomfichier, "_");
+    strcat(nomfichier, c);
+    strcat(nomfichier, ".csv");
+    printf("%s",nomfichier);
+    FILE* fichier = fopen(nomfichier, "w");
+    if (fichier == NULL) {
+        printf("Erreur: Impossible de créer le fichier");
+        exit(1);
+    }
+    Station* temp;
+    int h;
 
+    while(abr != NULL){
+        abr = suppMinAVL(abr,&h,&temp);
+        
+
+
+        free(temp);
+    }
+    
+    fclose(fichier);
+}
 
 
 
@@ -346,8 +371,18 @@ void afficherAVL(AVL* a, int niveau) {
 
 int main(int argc, char *argv[]) {
     AVL* arbre = NULL;
-    insertionStation(&arbre, atoi(argv[1]));  // Passez l'adresse de l'arbre, la colonne 1 pour l'identifiant (index 1)
-    calculConso(arbre,atoi(argv[1]));
+    int s;
+    if(strcmp(argv[1], "hvb") == 0){
+        s=2;
+    }else if(strcmp(argv[1], "hva") == 0){
+        s=3;
+    }else if(strcmp(argv[1], "lv") == 0){
+        s=4;
+    }
+    
+    insertionStation(&arbre, s);  // Passez l'adresse de l'arbre, la colonne 1 pour l'identifiant (index 1)
+    calculConso(arbre,s);
     afficherAVL(arbre, 0);  // Affiche l'arbre AVL
+    creerFichier(arbre,argv[1],argv[2]);
     return 0;
 }
