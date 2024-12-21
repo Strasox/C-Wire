@@ -138,6 +138,8 @@ if [ ! -d "tests" ]; then
     mkdir tests
 fi
 
+## Dans cette section, on filtre le fichier et on lance l'exécutable
+
 # On défini la colonne des station que l'on regarde
 case "$2" in
     "hvb") station_colonne=2 ;;
