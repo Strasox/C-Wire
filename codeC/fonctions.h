@@ -28,10 +28,10 @@ AVL* doubleRotationGauche(AVL* abr);
 // On rééquilibre l'AVL selon l'équilibre des noeud
 AVL* equilibrerAVL(AVL* abr);
 
-// On insert une station dans l'AVL
+// On insère une station récursivement dans l'AVL
 AVL* insertionAVL(AVL* abr,Station* s,int* h);
 
-// Suppression du minimum de l'AVL
+// Suppression du minimum de l'AVL récursivement
 AVL* suppMinAVL(AVL* abr, int* h, Station** stationMin);
 
 // Fonction pour insérer chaque ligne du fichier des stations dans l'AVL
