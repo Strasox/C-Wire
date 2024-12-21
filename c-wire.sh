@@ -186,6 +186,8 @@ if [ ! -z "$4" ]; then
 
     # On exécute exec avec les paramètres du script shell 
     ./codeC/exec $2 $3 $4
+
+    fichier_resultat_nom="tests/$2_$3_$4.csv"
 else
     # Même chose, mais sans filtrage par central
     awk -F';' -v station_colonne="$station_colonne" 'NR > 1 && $(station_colonne) != "-" && $(station_colonne+1) == "-" && $8 == "-"' "$1" > tmp/filtre_station.csv
@@ -202,6 +204,8 @@ else
 
     # On exécute exec avec les paramètres du script shell 
     ./codeC/exec $2 $3 Vide
+
+    fichier_resultat_nom="tests/$2_$3.csv"
 fi
 
 # Vérification du résultat de l'exec
@@ -210,6 +214,9 @@ if [ $? != 0 ]; then
     afficher_temps
     exit 12
 fi
+
+# Si le fichier resultat doit être trier par capacité
+sort -t: -k2 -n "$fichier_resultat_nom" -o "$fichier_resultat_nom"
 
 #On supprime les fichier crée par le make 
 make clean
