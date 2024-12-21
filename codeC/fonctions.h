@@ -40,7 +40,7 @@ void insertionStation(AVL** abr, int colonneStation);
 // Recherche dans un AVL une station et modifie dans sa structure la consommation de la station
 AVL* modifierAVL(AVL* abr, int idStation, int somme);
 
-// Calcul la consommation d'un type de station en donnant la somme de tout les consommateurs
+// Calcul la consommation d'un type de station en donnant la somme de tous les consommateurs
 void calculConso(AVL* abr, int colonneStation);
 
 // Création du fichier avec les résultat de l'AVL
