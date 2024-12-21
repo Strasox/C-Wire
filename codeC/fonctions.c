@@ -1,7 +1,6 @@
 #include "fonctions.h"
 #include "structure.h"
 
-
 // Fonction pour obtenir le maximum
 int max(int a, int b) {
     return (a > b) ? a : b;
@@ -12,6 +11,7 @@ int min(int a, int b) {
     return (a < b) ? a : b;
 }
 
+// Créé un oeud AVL avec une station
 AVL* creerAVL(Station* s)
 {
     // Allocation de la mémoire pour un nouveau noeud dans l'AVL d'une station
@@ -32,7 +32,6 @@ AVL* creerAVL(Station* s)
     return nouv;
 }
 
-
 // Rotation gauche pour rééquilibrer un AVL
 AVL* rotationGauche(AVL* abr){
     // On initialise le pivot
@@ -44,7 +43,7 @@ AVL* rotationGauche(AVL* abr){
     abr->fd = p->fg;
     p->fg = abr;
 
-    // On rééquilibre les noeuds 
+    // On rééquilibre l'équilibre des noeuds 
     abr->eq = eq_a - max(eq_p, 0) - 1;
     p->eq = min(min(eq_a - 2, eq_a + eq_p - 2), eq_p - 1);
     return p;
@@ -61,7 +60,7 @@ AVL* rotationDroite(AVL* abr){
     abr->fg = p->fd;
     p->fd = abr;
 
-    // On rééquilibre les noeuds 
+    // On rééquilibre l'équilibre des noeuds 
     abr->eq = eq_a - min(eq_p, 0) + 1;
     p->eq = max(max(eq_a + 2, eq_a + eq_p + 2), eq_p + 1);
     return p;
@@ -77,6 +76,7 @@ AVL* doubleRotationGauche(AVL* abr){
     return rotationGauche(abr);
 }
 
+// On rééquilibre l'AVL selon l'équilibre des noeud
 AVL* equilibrerAVL(AVL* abr){
     // Si l'AVL est penché trop à droite
     if(abr->eq >= 2){
@@ -98,20 +98,24 @@ AVL* equilibrerAVL(AVL* abr){
     return abr;
 }
 
-AVL* insertionAVL(AVL* abr,Station* s,int* h){
+// On insère une station récursivement dans l'AVL
+AVL* insertionAVL(AVL* abr, Station* s, int* h){
+    // Si le noeud est vide, on insère la station ici
     if(abr == NULL){
         *h = 1;
         return creerAVL(s);
+    // Si l'identifiant de la station est plus petit que celle du noeud
     }else if(s->identifiant < abr->station->identifiant){
         abr->fg = insertionAVL(abr->fg, s, h);
         *h = -*h;
+    // Si l'identifiant de la station est plus grand que celle du noeud
     }else if(s->identifiant > abr->station->identifiant){
         abr->fd = insertionAVL(abr->fd, s, h);
     }else{
         *h = 0;
         return abr;
     }
-
+    // On rééquilibre l'AVL
     if(*h != 0){
         abr->eq = abr->eq + *h;
         abr = equilibrerAVL(abr);
@@ -124,7 +128,7 @@ AVL* insertionAVL(AVL* abr,Station* s,int* h){
     return abr;
 }
 
-// Suppression du minimum
+// Suppression du minimum de l'AVL récursivement
 AVL* suppMinAVL(AVL* abr, int* h, Station** stationMin) {
     AVL* tmp;
     if (abr->fg == NULL) {
@@ -138,7 +142,7 @@ AVL* suppMinAVL(AVL* abr, int* h, Station** stationMin) {
         abr->fg = suppMinAVL(abr->fg, h, stationMin);
         *h = -*h;
     }
-
+    // On rééquilibre l'AVL
     if (*h != 0) {
         abr->eq = abr->eq + *h;
         abr = equilibrerAVL(abr);
@@ -151,19 +155,21 @@ AVL* suppMinAVL(AVL* abr, int* h, Station** stationMin) {
     return abr;
 }
 
-
+// // Fonction pour insérer chaque ligne du fichier des stations dans l'AVL
 void insertionStation(AVL **abr, int colonneStation) {
     Station *s;
     int h;
     int colonne = 0;
     char* donnee;
     char ligne[1024];  // Buffer pour lire chaque ligne du fichier
+    
+    // Ouvre le fichier pour lecture
     FILE* fichier = fopen("tmp/filtre_station.csv", "r");
     if (fichier == NULL) {
         printf("Erreur : fichier vide ou inaccessible.\n");
         exit(0);
     }
-    
+    // On récupère chaque ligne que l'on transforme en station
     while (fgets(ligne, sizeof(ligne), fichier)) {
         colonne = 0;  // La colonne ou on est placée
         s = malloc(sizeof(Station));
@@ -171,7 +177,7 @@ void insertionStation(AVL **abr, int colonneStation) {
             printf("Erreur d'allocation mémoire pour la station.\n");
             exit(1);
         }
-        
+        // Les ligne qui nous intéresse
         donnee = strtok(ligne, ";");
         while (donnee != NULL) {
             
@@ -191,6 +197,7 @@ void insertionStation(AVL **abr, int colonneStation) {
     fclose(fichier);
 }
 
+// Recherche dans un AVL une station et modifie dans sa structure la consommation de la station
 AVL* modifierAVL(AVL* abr, int idStation, int somme){
     if(abr == NULL){
         printf("erreur : arbre vide");
@@ -208,6 +215,7 @@ AVL* modifierAVL(AVL* abr, int idStation, int somme){
     return abr;
 }
 
+// Calcul la consommation d'un type de station en donnant la somme de tous les consommateurs
 void calculConso(AVL* abr, int colonneStation) {
     int colonne = 0;
     long int somme = 0;      
@@ -222,7 +230,6 @@ void calculConso(AVL* abr, int colonneStation) {
         printf("Erreur : fichier vide ou inaccessible.\n");
         exit(0);
     }
-
     // Parcours chaque ligne du fichier
     while (fgets(ligne, sizeof(ligne), fichier)) {
         colonne = 0;  // La colonne ou on est placée
@@ -242,10 +249,10 @@ void calculConso(AVL* abr, int colonneStation) {
                 }
             }
 
-            // Si on est à la colonne des consommations (colonne 7)
+            // Si on est dans la colonne des consommations
             else if (colonne == 7) {
                 if (tmp == 0) {
-                    abr = modifierAVL(abr, idStation, somme);  // Insertion dans l'AVL
+                    abr = modifierAVL(abr, idStation, somme);  // Mofifie l'AVL
                     somme = atol(donnee);  // Si tmp est 0, on initialise la consommation
                 } else {
                     somme += atol(donnee);  // Si tmp est 1, on ajoute à la consommation
@@ -253,10 +260,10 @@ void calculConso(AVL* abr, int colonneStation) {
             }
 
             colonne++;  // On passe à la colonne suivante
-            donnee = strtok(NULL, ";");  // On récupère le prochain token
+            donnee = strtok(NULL, ";");  // On récupère la prochaine colonne
             
         }
-        // Une fois que l'on a terminé une ligne, on met à jour l'AVL avec la consommation
+        // Une fois que l'on a terminé, on met à jour l'AVL avec la dernière consommation
         abr = modifierAVL(abr, idStation, somme);  // Insertion dans l'AVL
         
     }
@@ -264,8 +271,9 @@ void calculConso(AVL* abr, int colonneStation) {
     fclose(fichier);  // Fermeture du fichier après traitement
 }
 
-
+// Création du fichier avec les résultat de l'AVL
 void creerFichier(AVL* abr,char* s,char* c,char* central){
+    // On crée le nom du fichier
     char nomfichier[50];
     strcpy(nomfichier, "tests/");
     strcat(nomfichier, s);
@@ -276,13 +284,15 @@ void creerFichier(AVL* abr,char* s,char* c,char* central){
         strcat(nomfichier, central);
     }
     strcat(nomfichier, ".csv");
-
+    
+    // Ouvre crée le fichier
     FILE* fichier = fopen(nomfichier, "w");
     if (fichier == NULL) {
         printf("Erreur: Impossible de créer le fichier");
         exit(1);
     }
 
+    // On écrit la première ligne dans le fichier selon les paramètres
     if(strcmp(s, "hvb") == 0){
         fprintf(fichier, "%s:", "Station HV-B");
     }else if(strcmp(s, "hva") == 0){
@@ -301,7 +311,7 @@ void creerFichier(AVL* abr,char* s,char* c,char* central){
 
     Station* temp;
     int h;
-
+    // On remplie le fichier avec l'AVL
     while(abr != NULL){
         abr = suppMinAVL(abr,&h,&temp);
         fprintf(fichier, "%d:", temp->identifiant);
@@ -313,9 +323,6 @@ void creerFichier(AVL* abr,char* s,char* c,char* central){
     
     fclose(fichier);
 }
-
-
-
 
 // Affichage de l'AVL (ChatGPT pour vérifier si l'AVL fonctionne)
 void afficherAVL(AVL* a, int niveau) {
@@ -329,7 +336,8 @@ void afficherAVL(AVL* a, int niveau) {
     }
 }
 
-void interface(char *argv[]) {
+// Programme principal pour le résultat final
+void programme(char *argv[]) {
     AVL* arbre = NULL;
     int s;
     if(strcmp(argv[1], "hvb") == 0){
@@ -340,8 +348,8 @@ void interface(char *argv[]) {
         s=4;
     }
     
-    insertionStation(&arbre, s);  // Passez l'adresse de l'arbre, la colonne 1 pour l'identifiant (index 1)
+    insertionStation(&arbre, s);  
     calculConso(arbre,s);
-    afficherAVL(arbre, 0);  // Affiche l'arbre AVL
+    afficherAVL(arbre, 0); // Affiche l'arbre AVL(optionnel)
     creerFichier(arbre,argv[1],argv[2],argv[3]);
 }
