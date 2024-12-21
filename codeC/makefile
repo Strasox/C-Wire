@@ -1,8 +1,9 @@
-OBJ_DIR := fichier_o/
+# Lieu/dossier ou les fichier.o seront créé
+OBJ_DIR := fichier_o
 
 all: exec
 
-# Crée le répertoire des fichiers objets si nécessaire
+# Crée le dossier des fichier.o
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
