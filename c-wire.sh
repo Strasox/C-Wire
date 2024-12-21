@@ -211,6 +211,8 @@ if [ $? != 0 ]; then
     exit 12
 fi
 
+#On supprime les fichier crée par le make 
+make clean
 
 afficher_temps
 echo "Fin du Programme"
