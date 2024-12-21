@@ -103,14 +103,14 @@ fi
 # Vérification de l'existence de l'exécutable c 
 if [ ! -x "codeC/exec" ]; then
     # Vérification de l'existence du makefile
-    if (! make -C codeC); then
+    if (! make -C codeC -s); then
         echo "Erreur: Le makefile n'existe pas."
         afficher_temps
         exit 8
     fi
 
     # Exécution du makefile
-    make -C codeC 
+    make -C codeC -s
 
     # Vérification de l'existence de l'exécutable c 
     if [ ! -x "codeC/exec" ]; then
@@ -216,10 +216,10 @@ if [ $? != 0 ]; then
 fi
 
 # Si le fichier resultat doit être trier par capacité
-sort -t: -k2 -n "$fichier_resultat_nom" -o "$fichier_resultat_nom"
+# sort -t: -k2 -n "$fichier_resultat_nom" -o "$fichier_resultat_nom"
 
 #On supprime les fichier crée par le make 
-make clean
+make -C codeC clean -s
 
 afficher_temps
 echo "Fin du Programme"

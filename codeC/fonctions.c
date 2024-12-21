@@ -350,6 +350,6 @@ void programme(char *argv[]) {
     
     insertionStation(&arbre, s);  
     calculConso(arbre,s);
-    afficherAVL(arbre, 0); // Affiche l'arbre AVL(optionnel)
+    // afficherAVL(arbre, 0); // Affiche l'arbre AVL(optionnel)
     creerFichier(arbre,argv[1],argv[2],argv[3]);
 }
