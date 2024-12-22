@@ -174,6 +174,8 @@ if [ ! -z "$4" ]; then
     if [ $consommateur_colonne == "all" ]; then 
         # On enregistre dans un fichier les consommateurs, selon la central, la colonne de la station recherchée et la consommation doit être différent de rien (-)
         awk -F';' -v central="$4" -v station_colonne="$station_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $8 != "-"' "$1" > tmp/filtre_consommateur.csv
+
+        fichier_resultat_nom_minmax="tests/$2_$3_$4_minmax.csv"
     else
         # Même chose, mais on a un consommateur spécifique donc on vérifie la colonne des consommateurs.
         awk -F';' -v central="$4" -v station_colonne="$station_colonne" -v consommateur="$consommateur_colonne" 'NR > 1 && $1 == central && $(station_colonne) != "-" && $consommateur != "-"' "$1" > tmp/filtre_consommateur.csv
@@ -193,6 +195,8 @@ else
     awk -F';' -v station_colonne="$station_colonne" 'NR > 1 && $(station_colonne) != "-" && $(station_colonne+1) == "-" && $8 == "-"' "$1" > tmp/filtre_station.csv
     if [ $consommateur_colonne == "all" ]; then 
         awk -F';' -v station_colonne="$station_colonne" 'NR > 1 && $(station_colonne) != "-" && $8 != "-"' "$1" > tmp/filtre_consommateur.csv
+    
+        fichier_resultat_nom_minmax="tests/$2_$3_$4_minmax.csv"
     else
         awk -F';' -v station_colonne="$station_colonne" -v consommateur="$consommateur_colonne" 'NR > 1 && $(station_colonne) != "-" && $consommateur != "-"' "$1" > tmp/filtre_consommateur.csv
     fi
@@ -217,6 +221,37 @@ fi
 
 # Si le fichier resultat doit être trier par capacité
 # sort -t: -k2 -n "$fichier_resultat_nom" -o "$fichier_resultat_nom"
+
+# Crée un fichier temporaire avec une colonne différence absolue (ChatGPT)
+awk -F':' 'NR > 1 {
+    diff = $2 - $3;
+    if (diff < 0) diff = -diff;
+    print $0 ":" diff
+}' "$fichier_resultat_nom" > tmp/minmax.csv
+
+# On compte le nombre de ligne
+total_lines=$(wc -l < tmp/minmax.csv)
+
+# Vérification si le fichier contient suffisamment de lignes
+if [[ $total_lines -ge 10 ]]; then
+    # Copier des 10 plus grandes et 10 plus petites différences
+    sort -t':' -k4,4nr tmp/minmax.csv | head -n 10 > tmp/minmax_max.csv
+    sort -t':' -k4,4n tmp/minmax.csv | head -n 10 > tmp/minmax_min.csv
+
+    cat tmp/minmax_max.csv tmp/minmax_min.csv | awk -F':' '!seen[$1]++' > tmp/minmax_combiner.csv
+
+    # On met nos données dans le fichier minmax
+    {
+        # Ajout de l'en-tête
+        echo "Min and Max 'capacity-load' extreme nodes"
+        echo "Station LV:Capacité:Consommation (tous)"
+        # Écrire les lignes extraites sans la colonne "différence"
+        awk -F':' '{ print $1 ":" $2 ":" $3 }' tmp/minmax_combiner.csv
+    } > "$fichier_resultat_nom_minmax"
+
+    # Nettoyage des fichiers temporaires
+    rm tmp/minmax.csv tmp/minmax_max.csv tmp/minmax_min.csv tmp/minmax_combiner.csv
+fi
 
 #On supprime les fichier crée par le make 
 make -C codeC clean -s
