@@ -222,35 +222,37 @@ fi
 # Si le fichier resultat doit être trier par capacité
 # sort -t: -k2 -n "$fichier_resultat_nom" -o "$fichier_resultat_nom"
 
-# Crée un fichier temporaire avec une colonne différence absolue (ChatGPT)
-awk -F':' 'NR > 1 {
-    diff = $2 - $3;
-    if (diff < 0) diff = -diff;
-    print $0 ":" diff
-}' "$fichier_resultat_nom" > tmp/minmax.csv
+if [ $consommateur_colonne == "all" ]; then 
+    # Crée un fichier temporaire avec une colonne différence absolue (ChatGPT)
+    awk -F':' 'NR > 1 {
+        diff = $2 - $3;
+        if (diff < 0) diff = -diff;
+        print $0 ":" diff
+    }' "$fichier_resultat_nom" > tmp/minmax.csv
 
-# On compte le nombre de ligne
-total_lines=$(wc -l < tmp/minmax.csv)
+    # On compte le nombre de ligne
+    total_lines=$(wc -l < tmp/minmax.csv)
 
-# Vérification si le fichier contient suffisamment de lignes
-if [[ $total_lines -ge 10 ]]; then
-    # Copier des 10 plus grandes et 10 plus petites différences
-    sort -t':' -k4,4nr tmp/minmax.csv | head -n 10 > tmp/minmax_max.csv
-    sort -t':' -k4,4n tmp/minmax.csv | head -n 10 > tmp/minmax_min.csv
+    # Vérification si le fichier contient suffisamment de lignes
+    if [[ $total_lines -ge 10 ]]; then
+        # Copier des 10 plus grandes et 10 plus petites différences
+        sort -t':' -k4,4nr tmp/minmax.csv | head -n 10 > tmp/minmax_max.csv
+        sort -t':' -k4,4n tmp/minmax.csv | head -n 10 > tmp/minmax_min.csv
 
-    cat tmp/minmax_max.csv tmp/minmax_min.csv | awk -F':' '!seen[$1]++' > tmp/minmax_combiner.csv
+        cat tmp/minmax_max.csv tmp/minmax_min.csv | awk -F':' '!seen[$1]++' > tmp/minmax_combiner.csv
 
-    # On met nos données dans le fichier minmax
-    {
-        # Ajout de l'en-tête
-        echo "Min and Max 'capacity-load' extreme nodes"
-        echo "Station LV:Capacité:Consommation (tous)"
-        # Écrire les lignes extraites sans la colonne "différence"
-        awk -F':' '{ print $1 ":" $2 ":" $3 }' tmp/minmax_combiner.csv
-    } > "$fichier_resultat_nom_minmax"
+        # On met nos données dans le fichier minmax
+        {
+            # Ajout de l'en-tête
+            echo "Min and Max 'capacity-load' extreme nodes"
+            echo "Station LV:Capacité:Consommation (tous)"
+            # Écrire les lignes extraites sans la colonne "différence"
+            awk -F':' '{ print $1 ":" $2 ":" $3 }' tmp/minmax_combiner.csv
+        } > "$fichier_resultat_nom_minmax"
 
-    # Nettoyage des fichiers temporaires
-    rm tmp/minmax.csv tmp/minmax_max.csv tmp/minmax_min.csv tmp/minmax_combiner.csv
+        # Nettoyage des fichiers temporaires
+        rm tmp/minmax.csv tmp/minmax_max.csv tmp/minmax_min.csv tmp/minmax_combiner.csv
+    fi
 fi
 
 #On supprime les fichier crée par le make 
