@@ -8,7 +8,7 @@ Pour exécuter l'application, utilisez la commande suivante :
 ./c-wire.sh [-h] <chemin_du_fichier> <type_de_station> <type_de_consommateur> [identifiant_de_centrale]
 ```
 
-Les fichiers résultat sont au départ trié par station, mais il est possible de changer cela en enlevant le # à la ligne 223 du fichier `c-wire.sh`.
+Les fichiers résultat sont au départ trié par station, mais il est possible de trié par capacité en enlevant le # à la ligne 223 du fichier `c-wire.sh`.
 ### Options
 
 - `[-h]` *(Optionnel)* : Affiche l'aide de cette commande et ignore les autres options.
